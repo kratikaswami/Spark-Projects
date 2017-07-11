@@ -1,0 +1,14 @@
+from pyspark import SparkConf, SparkContext
+import collections
+
+conf = SparkConf().setMaster("local").setAppName("FirstSparkCode")
+sc = SparkContext(conf=conf)
+
+lines = sc.textFile("/home/kratika/Desktop/spark/ml-100k/u.data")
+rating = lines.map(lambda x: x.split()[2])
+result = rating.countByValue();
+
+sortedResult = collections.OrderedDict(sorted(result.items()))
+for k,v in sortedResult.item():
+    print("%s %i" % (k, v))
+    
