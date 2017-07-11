@@ -1,0 +1,21 @@
+from pyspark import SparkConf, SparkContext
+
+conf = SparkConf().setMaster("local").setAppName("Average-rating")
+sc = SparkContext(conf = conf)
+
+def parseLines(line) :
+    fields = lines.split(',')
+    ratings = int(fields[2])
+    movieId = int(fields[1])
+    return (movieId, ratings)
+
+lines = sc.textFile("/home/Desktop/u1.csv")
+rdd = lines.map(parseLines)
+
+totalsByMovies = rdd.mapValues(lambda x: (x, 1)).reduceByKey(lambda x, y: (x[0] + y[0], x[1] + y[1]))
+averageMovieRating = totalsByMovies.mapValues(lambda x : x[0]/x[1])
+results = averageMovieRating.collect()
+
+for result in results:
+    print(result)
+
