@@ -1,0 +1,19 @@
+from pyspark import SparkConf, SparkContext
+
+def parsedLines(line):
+    field = line.split(',')
+    customer = int(field[0])
+    amount = float(field[2])
+    return (customer, amount)
+
+conf = SparkConf().setMaster("local").setAppName("AmountSpentPerCustomer")
+sc = SparkContext(conf = conf)
+
+input = sc.textFile("path to file")
+rdd = input.map(parsedLines)
+total = rdd.map(lambda x:(x[0],x[1])).reduceByKey(lambda x,y:x+y)
+totalSorted = total.map(lambda x: (x[1],x[0])).sortByKey()
+results = totalSorted.collect()
+
+for result in results:
+    print(str(result[1]) + ":\t\t"+ str(result[0]))
